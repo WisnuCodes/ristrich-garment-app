@@ -1,0 +1,39 @@
+# Dependencies
+project-be/vendor/
+project-fe/node_modules/
+
+# Environment files
+project-be/.env
+project-be/.env.backup
+project-be/.env.production
+project-fe/.env
+project-fe/.env.local
+*.env
+
+# Production Builds & Storage
+project-fe/dist/
+project-fe/dist-ssr/
+project-be/public/storage
+project-be/public/build
+project-be/public/hot
+project-be/storage/*.key
+project-be/storage/logs/*.log
+project-be/storage/framework/cache/data/*
+project-be/storage/framework/sessions/*
+project-be/storage/framework/views/*
+
+# Logs & Cache
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+.phpunit.result.cache
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.sw?
+.taste-skill/
+
