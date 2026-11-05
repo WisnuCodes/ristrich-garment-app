@@ -11,6 +11,7 @@ project-fe/.env.local
 *.env
 
 # Production Builds & Storage
+*.sqlite
 project-fe/dist/
 project-fe/dist-ssr/
 project-be/public/storage
