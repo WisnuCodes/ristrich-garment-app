@@ -17,15 +17,6 @@ import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 
-const CATEGORY_TABS = [
-  "Semua Layanan",
-  "Kemeja PDH & PDL",
-  "Polo Shirt Bordir",
-  "Wearpack & Rompi",
-  "Jaket & Hoodie",
-  "Kaos & Jersey",
-];
-
 const ESTIMATOR_DATA = {
   "Kemeja PDH & PDL Instansi": {
     fabrics: [
@@ -99,7 +90,6 @@ const FAQ_LIST = [
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [layananList, setLayananList] = useState([]);
   const [portofolioList, setPortofolioList] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
 
@@ -111,19 +101,12 @@ export default function HomePage() {
   // FAQ Accordion State (default closed)
   const [openFaq, setOpenFaq] = useState(null);
 
-  // Home Catalog Filter Tab State
-  const [selectedHomeCategory, setSelectedHomeCategory] = useState("Semua Layanan");
-
   useEffect(() => {
     let isMounted = true;
     async function loadData() {
       try {
-        const [layananRes, portofolioRes] = await Promise.all([
-          catalogService.getLayanan(),
-          catalogService.getPortofolio(),
-        ]);
+        const portofolioRes = await catalogService.getPortofolio();
         if (isMounted) {
-          setLayananList(layananRes.data || []);
           setPortofolioList((portofolioRes.data || []).slice(0, 6));
           setLoadingData(false);
         }
@@ -161,16 +144,6 @@ export default function HomePage() {
     currentEstimator.basePrice * qtyDiscount,
   );
   const estimatedTotal = estimatedUnitPrice * calcQty;
-
-  const filteredHomeLayanan = layananList.filter((item) => {
-    if (selectedHomeCategory === "Semua Layanan") return true;
-    if (selectedHomeCategory === "Kemeja PDH & PDL") return /kemeja|pdh|pdl/i.test(item.nama_layanan);
-    if (selectedHomeCategory === "Polo Shirt Bordir") return /polo/i.test(item.nama_layanan);
-    if (selectedHomeCategory === "Wearpack & Rompi") return /wearpack|rompi|safety/i.test(item.nama_layanan);
-    if (selectedHomeCategory === "Jaket & Hoodie") return /jaket|hoodie|bomber|parka/i.test(item.nama_layanan);
-    if (selectedHomeCategory === "Kaos & Jersey") return /kaos|jersey/i.test(item.nama_layanan);
-    return true;
-  });
 
   return (
     <MainLayout activePage="/" fullWidth={true}>
@@ -341,187 +314,169 @@ export default function HomePage() {
 
       {/* WRAPPER FOR REMAINING SECTIONS */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-20">
-        {/* 2. KATALOG KONVEKSI RESMI - LAYANAN PRODUKSI BUSANA & SERAGAM */}
+        {/* 2. ALUR KERJA OPERASIONAL GARMEN (Transparent Manufacturing Pipeline) */}
         <section className="mb-20">
-          <div className="flex flex-col md:flex-row md:items-end justify-between pb-6 mb-6 gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between pb-6 mb-8 gap-6">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 text-xs font-bold text-amber-600 font-display">
-                <VerifiedUserOutlinedIcon sx={{ fontSize: 16 }} />
-                <span>KATALOG KONVEKSI RESMI • BENGKEL PRODUKSI SURAKARTA</span>
+                <PrecisionManufacturingOutlinedIcon sx={{ fontSize: 16 }} />
+                <span>STANDAR OPERASIONAL PRODUKSI • WORKSHOP SURAKARTA</span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-black text-slate-950 tracking-tight mt-1 font-display">
-                Layanan Produksi Busana &amp; Seragam.
+                Alur Manufaktur Transparan, Dari Desain Sampai Resi Terbit.
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-                Spesialisasi manufaktur kemeja kerja PDH/PDL instansi pemerintah, polo shirt bordir Tajima Jepang, wearpack lapangan K3, dan busana massal dengan standar toleransi mutu garmen industri.
+                Setiap pesanan seragam dinas dan busana massal dikerjakan melalui 5 tahapan kendali mutu terintegrasi dengan toleransi ukuran SNI dan sistem lacak resi transparan.
               </p>
             </div>
             <div className="shrink-0">
               <Link to="/layanan">
                 <Button variant="outline" size="sm" className="font-bold">
-                  Buka Seluruh Katalog &amp; Spesifikasi ({layananList.length})
+                  Buka Seluruh Katalog &amp; Spesifikasi
                   <ArrowForwardOutlinedIcon sx={{ fontSize: 13, ml: 1 }} />
                 </Button>
               </Link>
             </div>
           </div>
 
-          {/* Interactive Category Filter Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none">
-            {CATEGORY_TABS.map((tab) => {
-              const isActive = selectedHomeCategory === tab;
-              return (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setSelectedHomeCategory(tab)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
-                    isActive
-                      ? "bg-slate-950 text-white font-bold"
-                      : "bg-white border border-slate-200/90 text-slate-700 hover:bg-slate-100 hover:text-slate-950"
-                  }`}
-                >
-                  {tab}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Catalog Cards Grid */}
-          {loadingData ? (
-            <div className="py-20 flex justify-center bg-white rounded-2xl border border-slate-200">
-              <Spinner label="Memuat katalog layanan workshop..." />
-            </div>
-          ) : filteredHomeLayanan.length === 0 ? (
+          {/* 5-Stage Process Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <div
-              data-ui="feedback-state"
-              className="bg-white p-12 rounded-2xl border border-slate-200 text-center text-slate-500 text-xs space-y-2"
+              data-ui="pipeline-step"
+              className="bg-white rounded-2xl border border-slate-200/90 p-5 flex flex-col justify-between hover:border-slate-300 transition-colors"
             >
-              <p className="font-semibold text-slate-800 text-sm">
-                Tidak ada layanan di kategori ini.
-              </p>
-              <p>
-                Pilih tab "Semua Layanan" untuk menampilkan seluruh opsi busana.
-              </p>
-              <div className="pt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedHomeCategory("Semua Layanan")}
-                >
-                  Tampilkan Semua Layanan
-                </Button>
+              <div>
+                <div className="flex items-center justify-between pb-3">
+                  <span className="text-xs font-bold text-amber-700 font-display">Tahap 1</span>
+                  <span className="text-3xs font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-700">Tahap Awal</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-950 font-display">
+                  Konsultasi &amp; Approval Sampel
+                </h3>
+                <p className="text-2xs text-slate-600 mt-2 leading-relaxed">
+                  Penentuan gramasi kain (Nagata/Taipan/Lacoste), kesesuaian fitting ukuran SNI, dan pembuatan 1 pcs sampel fisik untuk persetujuan.
+                </p>
+              </div>
+              <div className="pt-3 mt-4 flex items-center gap-1.5 text-3xs font-semibold text-slate-500">
+                <CheckCircleOutlinedIcon sx={{ fontSize: 13, color: '#10b981' }} />
+                <span>Free Sampel (100+ Pcs)</span>
               </div>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredHomeLayanan.slice(0, 6).map((item) => (
-                <div
-                  key={item.id}
-                  data-ui="garment-card"
-                  className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden flex flex-col justify-between hover:border-slate-300 transition-colors group"
-                >
-                  <div>
-                    {/* Visual Frame */}
-                    <div className="h-52 bg-slate-100 overflow-hidden relative">
-                      <img
-                        src={item.foto_url || "/images/placeholder-service.jpg"}
-                        alt={item.nama_layanan}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src =
-                            "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&auto=format&fit=crop&q=80";
-                        }}
-                      />
-                      <div className="absolute top-3 left-3 bg-slate-900/90 text-white text-3xs font-semibold px-2.5 py-1 rounded-md flex items-center gap-1.5">
-                        <AccessTimeOutlinedIcon
-                          sx={{ fontSize: 13, color: "#f59e0b" }}
-                        />
-                        <span>
-                          {item.estimasi_hari
-                            ? `${item.estimasi_hari} Hari Kerja`
-                            : "10–14 Hari Kerja"}
-                        </span>
-                      </div>
-                      <div className="absolute top-3 right-3 bg-slate-900/90 text-amber-400 text-3xs font-bold px-2.5 py-1 rounded-md tabular-nums">
-                        MOQ {item.minimal_order || 24} Pcs
-                      </div>
-                    </div>
 
-                    {/* Card Body */}
-                    <div className="p-5">
-                      <Link to={`/layanan/${item.id}`}>
-                        <h3 className="text-base font-bold text-slate-950 font-display group-hover:text-amber-600 transition-colors">
-                          {item.nama_layanan}
-                        </h3>
-                      </Link>
-                      <p className="text-xs text-slate-600 mt-2 line-clamp-2 leading-relaxed">
-                        {item.deskripsi}
-                      </p>
-
-                      {/* Manufacturing Specs Panel */}
-                      <div className="mt-4 p-3.5 rounded-xl bg-slate-50 space-y-2 text-2xs">
-                        <div>
-                          <span className="text-slate-400 font-medium block">
-                            Rekomendasi Bahan Kain:
-                          </span>
-                          <strong className="text-slate-800 line-clamp-1">
-                            {item.bahan_rekomendasi ||
-                              "Nagata Drill Japan / American 1919"}
-                          </strong>
-                        </div>
-                        <div className="flex items-center justify-between text-slate-500 pt-1">
-                          <span>Standar Mesin:</span>
-                          <strong className="text-slate-800">
-                            Bordir Tajima / Juki Industri
-                          </strong>
-                        </div>
-                        <div className="flex items-center justify-between text-slate-500">
-                          <span>Jaminan Mutu:</span>
-                          <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                            <CheckCircleOutlinedIcon sx={{ fontSize: 12 }} />
-                            QC Lolos Toleransi ±0.5cm
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card Actions */}
-                  <div className="p-5 pt-0 flex items-center gap-2">
-                    <Link
-                      to={`/layanan/${item.id}`}
-                      className="flex-1"
-                    >
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full justify-center font-bold text-slate-700"
-                      >
-                        Detail Spek
-                      </Button>
-                    </Link>
-                    <Link
-                      to={`/pesan?kategori=${encodeURIComponent(item.nama_layanan)}`}
-                      className="flex-1"
-                    >
-                      <Button
-                        variant="accent"
-                        size="sm"
-                        className="w-full justify-center font-bold"
-                      >
-                        Pesan
-                        <ArrowForwardOutlinedIcon
-                          sx={{ fontSize: 13, ml: 0.5 }}
-                        />
-                      </Button>
-                    </Link>
-                  </div>
+            <div
+              data-ui="pipeline-step"
+              className="bg-white rounded-2xl border border-slate-200/90 p-5 flex flex-col justify-between hover:border-slate-300 transition-colors"
+            >
+              <div>
+                <div className="flex items-center justify-between pb-3">
+                  <span className="text-xs font-bold text-slate-800 font-display">Tahap 2</span>
+                  <span className="text-3xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">Digital Pola</span>
                 </div>
-              ))}
+                <h3 className="text-sm font-bold text-slate-950 font-display">
+                  CAD Optitex &amp; Potong Elektrik
+                </h3>
+                <p className="text-2xs text-slate-600 mt-2 leading-relaxed">
+                  Digitalisasi pola busana dengan akurasi presisi tinggi, kalkulasi efisiensi bentangan kain, dan pemotongan pisau elektrik otomatis.
+                </p>
+              </div>
+              <div className="pt-3 mt-4 flex items-center gap-1.5 text-3xs font-semibold text-slate-500">
+                <CheckCircleOutlinedIcon sx={{ fontSize: 13, color: '#10b981' }} />
+                <span>Toleransi ±0.5 cm</span>
+              </div>
             </div>
-          )}
+
+            <div
+              data-ui="pipeline-step"
+              className="bg-white rounded-2xl border border-slate-200/90 p-5 flex flex-col justify-between hover:border-slate-300 transition-colors"
+            >
+              <div>
+                <div className="flex items-center justify-between pb-3">
+                  <span className="text-xs font-bold text-slate-800 font-display">Tahap 3</span>
+                  <span className="text-3xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">Bordir &amp; Sablon</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-950 font-display">
+                  Bordir Tajima 12 Kepala
+                </h3>
+                <p className="text-2xs text-slate-600 mt-2 leading-relaxed">
+                  Penyematan identitas logo instansi memakai mesin Tajima Jepang 12 kepala berkecepatan 1.000 rpm untuk kerapatan benang sempurna.
+                </p>
+              </div>
+              <div className="pt-3 mt-4 flex items-center gap-1.5 text-3xs font-semibold text-slate-500">
+                <CheckCircleOutlinedIcon sx={{ fontSize: 13, color: '#10b981' }} />
+                <span>1.000 Tusukan / Menit</span>
+              </div>
+            </div>
+
+            <div
+              data-ui="pipeline-step"
+              className="bg-white rounded-2xl border border-slate-200/90 p-5 flex flex-col justify-between hover:border-slate-300 transition-colors"
+            >
+              <div>
+                <div className="flex items-center justify-between pb-3">
+                  <span className="text-xs font-bold text-slate-800 font-display">Tahap 4</span>
+                  <span className="text-3xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">Perakitan</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-950 font-display">
+                  Jahit Garmen Juki Jarum 2
+                </h3>
+                <p className="text-2xs text-slate-600 mt-2 leading-relaxed">
+                  Penjahitan garmen berstandar ekspor dengan jahitan rantai pundak, obras 5 benang anti-jebol, dan bartack penguat di titik kritis.
+                </p>
+              </div>
+              <div className="pt-3 mt-4 flex items-center gap-1.5 text-3xs font-semibold text-slate-500">
+                <CheckCircleOutlinedIcon sx={{ fontSize: 13, color: '#10b981' }} />
+                <span>Juki DDL-9000 Industry</span>
+              </div>
+            </div>
+
+            <div
+              data-ui="pipeline-step"
+              className="bg-white rounded-2xl border border-slate-200/90 p-5 flex flex-col justify-between hover:border-slate-300 transition-colors"
+            >
+              <div>
+                <div className="flex items-center justify-between pb-3">
+                  <span className="text-xs font-bold text-emerald-800 font-display">Tahap 5</span>
+                  <span className="text-3xs font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700">Final QC</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-950 font-display">
+                  QC 5 Titik &amp; Terbit Resi
+                </h3>
+                <p className="text-2xs text-slate-600 mt-2 leading-relaxed">
+                  Pemeriksaan ukuran dan jahitan, pembersihan sisa benang, setrika uap Stirovap, serta penerbitan nomor resi RG resmi secara real-time.
+                </p>
+              </div>
+              <div className="pt-3 mt-4 flex items-center gap-1.5 text-3xs font-semibold text-slate-500">
+                <CheckCircleOutlinedIcon sx={{ fontSize: 13, color: '#10b981' }} />
+                <span>Resi Lacak Aktif</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Catalog Access Strip */}
+          <div
+            data-ui="catalog-banner"
+            className="mt-6 bg-slate-50 rounded-2xl p-6 border border-slate-200/90 flex flex-col sm:flex-row items-center justify-between gap-4"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                <VerifiedUserOutlinedIcon sx={{ fontSize: 20 }} />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-900 font-display">
+                  Cari Spesifikasi Kain, Ukuran Size Chart, dan Detail Paket Busana?
+                </h4>
+                <p className="text-2xs text-slate-500 mt-0.5">
+                  Seluruh panduan teknis kemeja PDH, polo shirt, wearpack K3, dan jaket tersedia lengkap di katalog resmi kami.
+                </p>
+              </div>
+            </div>
+            <Link to="/layanan" className="shrink-0 w-full sm:w-auto">
+              <Button variant="accent" size="sm" className="w-full sm:w-auto font-bold justify-center">
+                Buka Katalog Layanan &amp; Bahan
+                <ArrowForwardOutlinedIcon sx={{ fontSize: 13, ml: 1 }} />
+              </Button>
+            </Link>
+          </div>
         </section>
 
         {/* 3. INTERACTIVE FEATURE: KALKULATOR ESTIMASI CEPAT (One Live Thing) */}
