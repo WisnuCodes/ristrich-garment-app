@@ -96,8 +96,13 @@ class PesananMasukController extends Controller
             'alasan_batal'     => $alasanBatal,
         ]);
 
+        $pesanan->refresh()->load('user');
+
+        // Broadcast event real-time ke Laravel Reverb (WebSocket)
+        broadcast(new \App\Events\OrderStatusUpdated($pesanan));
+
         return $this->successResponse(
-            new PesananResource($pesanan->fresh(['user'])),
+            new PesananResource($pesanan),
             "Status pesanan #{$pesanan->kode_resi} berhasil diperbarui menjadi '{$newStatus}'."
         );
     }
