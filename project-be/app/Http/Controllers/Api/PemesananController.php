@@ -78,6 +78,9 @@ class PemesananController extends Controller
             'alasan_batal'     => null,
         ]);
 
+        $pesanan->load('user');
+        broadcast(new \App\Events\OrderStatusUpdated($pesanan));
+
         return $this->successResponse(
             new PesananResource($pesanan),
             'Pesanan Anda berhasil dikirim ke antrean produksi CV Ristrich Garment!',
